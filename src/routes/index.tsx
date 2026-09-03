@@ -114,7 +114,12 @@ function Index() {
         const balance = parsed.initialBalance || 0;
         setInitialBalance(balance);
         setInitialBalanceInput(formatCurrency(balance));
-        setProducts(parsed.products || []);
+        setProducts(
+          (parsed.products || []).map((product) => ({
+            ...product,
+            category: (product.category || "Outros") as Category,
+          }))
+        );
       }
     } catch (error) {
       console.error("Erro ao carregar dados salvos:", error);
