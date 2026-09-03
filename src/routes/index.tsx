@@ -342,17 +342,11 @@ function Index() {
                   <span className="text-xs text-muted-foreground">
                     Categoria
                   </span>
-                  <select
+                  <CategorySelect
                     value={category}
-                    onChange={(e) => setCategory(e.target.value as Category)}
-                    className="mt-1 w-full rounded-lg bg-black/30 py-2 pl-3 pr-8 text-sm text-foreground ring-1 ring-white/10 focus:ring-2 focus:ring-mint/40 focus:outline-none"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => setCategory(value as Category)}
+                    className="mt-1 w-full"
+                  />
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block">
