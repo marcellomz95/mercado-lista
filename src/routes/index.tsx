@@ -97,7 +97,7 @@ function Index() {
   const [initialBalanceInput, setInitialBalanceInput] = useState("0,00");
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"name" | "value">("name");
+  const [sortBy, setSortBy] = useState<"name" | "value" | "category">("name");
   const [filterCategory, setFilterCategory] = useState<Category | "">("");
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -162,6 +162,8 @@ function Index() {
 
     if (sortBy === "name") {
       list.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "category") {
+      list.sort((a, b) => a.category.localeCompare(b.category));
     } else {
       list.sort(
         (a, b) =>
@@ -476,11 +478,12 @@ function Index() {
                   <select
                     value={sortBy}
                     onChange={(e) =>
-                      setSortBy(e.target.value as "name" | "value")
+                      setSortBy(e.target.value as "name" | "value" | "category")
                     }
                     className="rounded-lg bg-black/30 py-2 pl-3 pr-8 text-sm text-foreground ring-1 ring-white/10 focus:ring-2 focus:ring-mint/40 focus:outline-none"
                   >
                     <option value="name">Nome</option>
+                    <option value="category">Categoria</option>
                     <option value="value">Valor</option>
                   </select>
                 </div>
