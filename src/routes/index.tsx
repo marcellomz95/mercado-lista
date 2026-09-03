@@ -164,6 +164,7 @@ function Index() {
   function resetForm() {
     setEditingId(null);
     setName("");
+    setCategory("Outros");
     setQuantity("");
     setUnitPrice("");
   }
