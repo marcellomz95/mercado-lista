@@ -98,9 +98,11 @@ function Index() {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "value">("name");
+  const [filterCategory, setFilterCategory] = useState<Category | "">("");
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const [category, setCategory] = useState<Category>("Outros");
   const [quantity, setQuantity] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
 
