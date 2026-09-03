@@ -30,22 +30,6 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-type Category =
-  | "Hortifruti"
-  | "Carnes e Frios"
-  | "Padaria"
-  | "Laticínios"
-  | "Mercearia"
-  | "Bebidas"
-  | "Limpeza"
-  | "Higiene"
-  | "Utilidades"
-  | "Pet Shop"
-  | "Bebê"
-  | "Saúde"
-  | "Doces e Snacks"
-  | "Outros";
-
 interface Product {
   id: string;
   name: string;
@@ -58,23 +42,6 @@ interface PersistedData {
   initialBalance: number;
   products: Product[];
 }
-
-const CATEGORIES: Category[] = [
-  "Hortifruti",
-  "Carnes e Frios",
-  "Padaria",
-  "Laticínios",
-  "Mercearia",
-  "Bebidas",
-  "Limpeza",
-  "Higiene",
-  "Utilidades",
-  "Pet Shop",
-  "Bebê",
-  "Saúde",
-  "Doces e Snacks",
-  "Outros",
-];
 
 const STORAGE_KEY = "minha-lista-compras-v1";
 
