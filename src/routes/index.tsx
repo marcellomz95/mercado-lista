@@ -232,7 +232,8 @@ function Index() {
                 <input
                   type="text"
                   inputMode="decimal"
-                  defaultValue={formatCurrency(initialBalance)}
+                  value={initialBalanceInput}
+                  onChange={(e) => setInitialBalanceInput(e.target.value)}
                   onBlur={(e) => handleInitialBalanceChange(e.target.value)}
                   className="w-full bg-transparent text-2xl font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/40"
                   aria-label="Saldo inicial"
