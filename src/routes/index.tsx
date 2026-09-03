@@ -60,6 +60,7 @@ function currencyInputToNumber(value: string) {
 function Index() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [initialBalance, setInitialBalance] = useState(0);
+  const [initialBalanceInput, setInitialBalanceInput] = useState("0,00");
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "value">("name");
@@ -74,7 +75,9 @@ function Index() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed: PersistedData = JSON.parse(saved);
-        setInitialBalance(parsed.initialBalance || 0);
+        const balance = parsed.initialBalance || 0;
+        setInitialBalance(balance);
+        setInitialBalanceInput(formatCurrency(balance));
         setProducts(parsed.products || []);
       }
     } catch (error) {
@@ -171,7 +174,9 @@ function Index() {
   }
 
   function handleInitialBalanceChange(value: string) {
-    setInitialBalance(currencyInputToNumber(value));
+    const numeric = currencyInputToNumber(value);
+    setInitialBalance(numeric);
+    setInitialBalanceInput(formatCurrency(numeric));
   }
 
   if (!isLoaded) {
