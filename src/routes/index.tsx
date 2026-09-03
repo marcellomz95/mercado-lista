@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pencil, Search, Trash2 } from "lucide-react";
+import {
+  CategorySelect,
+  CATEGORIES,
+  CATEGORY_ICONS,
+  type Category,
+} from "@/components/CategorySelect";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -24,22 +30,6 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-type Category =
-  | "Hortifruti"
-  | "Carnes e Frios"
-  | "Padaria"
-  | "Laticínios"
-  | "Mercearia"
-  | "Bebidas"
-  | "Limpeza"
-  | "Higiene"
-  | "Utilidades"
-  | "Pet Shop"
-  | "Bebê"
-  | "Saúde"
-  | "Doces e Snacks"
-  | "Outros";
-
 interface Product {
   id: string;
   name: string;
@@ -52,23 +42,6 @@ interface PersistedData {
   initialBalance: number;
   products: Product[];
 }
-
-const CATEGORIES: Category[] = [
-  "Hortifruti",
-  "Carnes e Frios",
-  "Padaria",
-  "Laticínios",
-  "Mercearia",
-  "Bebidas",
-  "Limpeza",
-  "Higiene",
-  "Utilidades",
-  "Pet Shop",
-  "Bebê",
-  "Saúde",
-  "Doces e Snacks",
-  "Outros",
-];
 
 const STORAGE_KEY = "minha-lista-compras-v1";
 
@@ -369,17 +342,11 @@ function Index() {
                   <span className="text-xs text-muted-foreground">
                     Categoria
                   </span>
-                  <select
+                  <CategorySelect
                     value={category}
-                    onChange={(e) => setCategory(e.target.value as Category)}
-                    className="mt-1 w-full rounded-lg bg-black/30 py-2 pl-3 pr-8 text-sm text-foreground ring-1 ring-white/10 focus:ring-2 focus:ring-mint/40 focus:outline-none"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => setCategory(value as Category)}
+                    className="mt-1 w-full"
+                  />
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block">
@@ -461,20 +428,12 @@ function Index() {
                       className="w-full rounded-lg bg-black/30 py-2 pl-9 pr-3 text-sm text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none sm:w-48"
                     />
                   </div>
-                  <select
+                  <CategorySelect
                     value={filterCategory}
-                    onChange={(e) =>
-                      setFilterCategory(e.target.value as Category | "")
-                    }
-                    className="rounded-lg bg-black/30 py-2 pl-3 pr-8 text-sm text-foreground ring-1 ring-white/10 focus:ring-2 focus:ring-mint/40 focus:outline-none"
-                  >
-                    <option value="">Todas as categorias</option>
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => setFilterCategory(value as Category | "")}
+                    includeAll
+                    className="w-44"
+                  />
                   <select
                     value={sortBy}
                     onChange={(e) =>
@@ -522,7 +481,8 @@ function Index() {
                             {product.name}
                           </td>
                           <td className="py-3 pr-3">
-                            <span className="inline-flex rounded-full bg-white/10 px-2 py-0.5 text-xs text-muted-foreground ring-1 ring-white/10">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 text-xs text-muted-foreground ring-1 ring-white/10">
+                              {CATEGORY_ICONS[product.category]}
                               {product.category}
                             </span>
                           </td>
