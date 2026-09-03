@@ -143,9 +143,17 @@ function Index() {
 
   const filteredProducts = useMemo(() => {
     const term = search.trim().toLowerCase();
-    let list = term
-      ? products.filter((product) => product.name.toLowerCase().includes(term))
-      : [...products];
+    let list = [...products];
+
+    if (term) {
+      list = list.filter((product) =>
+        product.name.toLowerCase().includes(term)
+      );
+    }
+
+    if (filterCategory) {
+      list = list.filter((product) => product.category === filterCategory);
+    }
 
     if (sortBy === "name") {
       list.sort((a, b) => a.name.localeCompare(b.name));
@@ -156,7 +164,7 @@ function Index() {
       );
     }
     return list;
-  }, [products, search, sortBy]);
+  }, [products, search, sortBy, filterCategory]);
 
   const calculatedTotal =
     (parseInt(quantity, 10) || 0) * currencyInputToNumber(unitPrice);
