@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pencil, Search, Trash2 } from "lucide-react";
+import {
+  CategorySelect,
+  CATEGORIES,
+  CATEGORY_ICONS,
+  type Category,
+} from "@/components/CategorySelect";
 
 export const Route = createFileRoute("/")({
   component: Index,
