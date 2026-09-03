@@ -168,4 +168,21 @@
   input[type="number"] {
     -moz-appearance: textfield;
   }
+
+  select {
+    background-color: var(--panel);
+    color: var(--foreground);
+  }
+
+  select option {
+    background-color: var(--panel);
+    color: var(--foreground);
+  }
+
+  select option:checked,
+  select option:hover,
+  select:focus option:checked {
+    background-color: var(--mint);
+    color: var(--ink);
+  }
 }
