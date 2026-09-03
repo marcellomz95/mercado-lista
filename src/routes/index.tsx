@@ -481,7 +481,8 @@ function Index() {
                             {product.name}
                           </td>
                           <td className="py-3 pr-3">
-                            <span className="inline-flex rounded-full bg-white/10 px-2 py-0.5 text-xs text-muted-foreground ring-1 ring-white/10">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 text-xs text-muted-foreground ring-1 ring-white/10">
+                              {CATEGORY_ICONS[product.category]}
                               {product.category}
                             </span>
                           </td>
