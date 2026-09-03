@@ -358,6 +358,22 @@ function Index() {
                     className="mt-1 w-full rounded-lg bg-black/30 px-3 py-2 text-sm text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
                   />
                 </label>
+                <label className="block">
+                  <span className="text-xs text-muted-foreground">
+                    Categoria
+                  </span>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value as Category)}
+                    className="mt-1 w-full rounded-lg bg-black/30 py-2 pl-3 pr-8 text-sm text-foreground ring-1 ring-white/10 focus:ring-2 focus:ring-mint/40 focus:outline-none"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <div className="grid grid-cols-2 gap-3">
                   <label className="block">
                     <span className="text-xs text-muted-foreground">
@@ -439,6 +455,20 @@ function Index() {
                     />
                   </div>
                   <select
+                    value={filterCategory}
+                    onChange={(e) =>
+                      setFilterCategory(e.target.value as Category | "")
+                    }
+                    className="rounded-lg bg-black/30 py-2 pl-3 pr-8 text-sm text-foreground ring-1 ring-white/10 focus:ring-2 focus:ring-mint/40 focus:outline-none"
+                  >
+                    <option value="">Todas as categorias</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                  <select
                     value={sortBy}
                     onChange={(e) =>
                       setSortBy(e.target.value as "name" | "value")
@@ -454,9 +484,12 @@ function Index() {
               <div className="mt-4 overflow-x-auto">
                 {filteredProducts.length === 0 ? (
                   <div className="rounded-lg bg-black/20 py-10 text-center text-sm text-muted-foreground ring-1 ring-white/10">
-                    {search.trim() ? (
+                    {search.trim() || filterCategory ? (
                       <>
-                        Nenhum produto encontrado para "{search.trim()}".
+                        Nenhum produto encontrado
+                        {search.trim() && ` para "${search.trim()}"`}
+                        {filterCategory && ` na categoria "${filterCategory}"`}
+                        .
                       </>
                     ) : (
                       <>Nenhum produto na lista ainda. Adicione o primeiro item.</>
@@ -467,6 +500,7 @@ function Index() {
                     <thead>
                       <tr className="text-left text-xs text-muted-foreground">
                         <th className="pb-2 font-medium">Produto</th>
+                        <th className="pb-2 font-medium">Categoria</th>
                         <th className="pb-2 text-right font-medium">Qtd</th>
                         <th className="pb-2 text-right font-medium">Unit.</th>
                         <th className="pb-2 text-right font-medium">Total</th>
@@ -478,6 +512,11 @@ function Index() {
                         <tr key={product.id}>
                           <td className="py-3 pr-3 font-medium text-foreground">
                             {product.name}
+                          </td>
+                          <td className="py-3 pr-3">
+                            <span className="inline-flex rounded-full bg-white/10 px-2 py-0.5 text-xs text-muted-foreground ring-1 ring-white/10">
+                              {product.category}
+                            </span>
                           </td>
                           <td className="py-3 pr-3 text-right text-muted-foreground">
                             {product.quantity}
