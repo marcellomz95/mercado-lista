@@ -180,7 +180,7 @@ function Index() {
       setProducts((prev) =>
         prev.map((product) =>
           product.id === editingId
-            ? { ...product, name: name.trim(), quantity: qty, unitPrice: price }
+            ? { ...product, name: name.trim(), category, quantity: qty, unitPrice: price }
             : product
         )
       );
@@ -190,6 +190,7 @@ function Index() {
         {
           id: crypto.randomUUID(),
           name: name.trim(),
+          category,
           quantity: qty,
           unitPrice: price,
         },
@@ -201,6 +202,7 @@ function Index() {
   function handleEdit(product: Product) {
     setEditingId(product.id);
     setName(product.name);
+    setCategory(product.category);
     setQuantity(product.quantity.toString());
     setUnitPrice(formatCurrency(product.unitPrice));
   }
