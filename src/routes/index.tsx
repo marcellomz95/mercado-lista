@@ -1,28 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pencil, Search, Trash2 } from "lucide-react";
+import {
+  Check,
+  ClipboardPaste,
+  Copy,
+  Pencil,
+  Search,
+  ShoppingCart,
+  Trash2,
+  X,
+} from "lucide-react";
+import { toast } from "sonner";
 import {
   CategorySelect,
-  CATEGORIES,
   CATEGORY_ICONS,
   type Category,
 } from "@/components/CategorySelect";
+import { decodeSeed, encodeSeed } from "@/lib/seed";
 
 export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Minha Lista de Compras" },
+      { title: "Lista de Compras — by MarcelloMZ" },
       {
         name: "description",
         content:
-          "Controle suas compras e orçamento de forma simples e intuitiva.",
+          "Controle suas compras e orçamento, edite preços na lista e compartilhe tudo com uma seed.",
       },
-      { property: "og:title", content: "Minha Lista de Compras" },
+      { property: "og:title", content: "Lista de Compras — by MarcelloMZ" },
       {
         property: "og:description",
         content:
-          "Controle suas compras e orçamento de forma simples e intuitiva.",
+          "Controle suas compras e orçamento, edite preços na lista e compartilhe tudo com uma seed.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -36,6 +46,7 @@ interface Product {
   category: Category;
   quantity: number;
   unitPrice: number;
+  purchased: boolean;
 }
 
 interface PersistedData {
@@ -72,12 +83,17 @@ function Index() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "value" | "category">("name");
   const [filterCategory, setFilterCategory] = useState<Category | "">("");
+  const [priceDrafts, setPriceDrafts] = useState<Record<string, string>>({});
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category>("Outros");
   const [quantity, setQuantity] = useState("");
-  const [unitPrice, setUnitPrice] = useState("");
+
+  const [seedModalOpen, setSeedModalOpen] = useState(false);
+  const [seedInput, setSeedInput] = useState("");
+  const [seedError, setSeedError] = useState("");
+  const [pendingSeed, setPendingSeed] = useState<PersistedData | null>(null);
 
   useEffect(() => {
     try {
@@ -91,6 +107,7 @@ function Index() {
           (parsed.products || []).map((product) => ({
             ...product,
             category: (product.category || "Outros") as Category,
+            purchased: Boolean(product.purchased),
           }))
         );
       }
@@ -106,8 +123,18 @@ function Index() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }, [initialBalance, products, isLoaded]);
 
+  /** Seed recalculada automaticamente a cada alteração na lista. */
+  const seed = useMemo(
+    () => encodeSeed({ initialBalance, products }),
+    [initialBalance, products]
+  );
+
   const totalPurchases = useMemo(
-    () => products.reduce((sum, product) => sum + product.quantity * product.unitPrice, 0),
+    () =>
+      products.reduce(
+        (sum, product) => sum + product.quantity * product.unitPrice,
+        0
+      ),
     [products]
   );
 
@@ -139,36 +166,30 @@ function Index() {
       list.sort((a, b) => a.category.localeCompare(b.category));
     } else {
       list.sort(
-        (a, b) =>
-          b.quantity * b.unitPrice - a.quantity * a.unitPrice
+        (a, b) => b.quantity * b.unitPrice - a.quantity * a.unitPrice
       );
     }
     return list;
   }, [products, search, sortBy, filterCategory]);
-
-  const calculatedTotal =
-    (parseInt(quantity, 10) || 0) * currencyInputToNumber(unitPrice);
 
   function resetForm() {
     setEditingId(null);
     setName("");
     setCategory("Outros");
     setQuantity("");
-    setUnitPrice("");
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const qty = parseInt(quantity, 10) || 0;
-    const price = currencyInputToNumber(unitPrice);
 
-    if (!name.trim() || qty <= 0 || price <= 0) return;
+    if (!name.trim() || qty <= 0) return;
 
     if (editingId) {
       setProducts((prev) =>
         prev.map((product) =>
           product.id === editingId
-            ? { ...product, name: name.trim(), category, quantity: qty, unitPrice: price }
+            ? { ...product, name: name.trim(), category, quantity: qty }
             : product
         )
       );
@@ -180,7 +201,8 @@ function Index() {
           name: name.trim(),
           category,
           quantity: qty,
-          unitPrice: price,
+          unitPrice: 0,
+          purchased: false,
         },
       ]);
     }
@@ -192,7 +214,6 @@ function Index() {
     setName(product.name);
     setCategory(product.category);
     setQuantity(product.quantity.toString());
-    setUnitPrice(formatCurrency(product.unitPrice));
   }
 
   function handleDelete(id: string) {
@@ -200,10 +221,77 @@ function Index() {
     if (editingId === id) resetForm();
   }
 
+  function handleUnitPriceCommit(id: string, raw: string) {
+    const price = currencyInputToNumber(raw);
+    setProducts((prev) =>
+      prev.map((product) =>
+        product.id === id ? { ...product, unitPrice: price } : product
+      )
+    );
+    setPriceDrafts((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+
+  function togglePurchased(id: string) {
+    setProducts((prev) =>
+      prev.map((product) =>
+        product.id === id
+          ? { ...product, purchased: !product.purchased }
+          : product
+      )
+    );
+  }
+
   function handleInitialBalanceChange(value: string) {
     const numeric = currencyInputToNumber(value);
     setInitialBalance(numeric);
     setInitialBalanceInput(formatCurrency(numeric));
+  }
+
+  async function handleCopySeed() {
+    try {
+      await navigator.clipboard.writeText(seed);
+      toast.success("Seed copiada");
+    } catch {
+      toast.error("Não foi possível copiar a seed");
+    }
+  }
+
+  function handleValidateSeed() {
+    try {
+      const payload = decodeSeed(seedInput);
+      setSeedError("");
+      setPendingSeed(payload);
+    } catch (error) {
+      setPendingSeed(null);
+      setSeedError(
+        error instanceof Error ? error.message : "Seed inválida."
+      );
+    }
+  }
+
+  function handleConfirmSeed() {
+    if (!pendingSeed) return;
+    setInitialBalance(pendingSeed.initialBalance);
+    setInitialBalanceInput(formatCurrency(pendingSeed.initialBalance));
+    setProducts(pendingSeed.products);
+    setPriceDrafts({});
+    resetForm();
+    setPendingSeed(null);
+    setSeedInput("");
+    setSeedError("");
+    setSeedModalOpen(false);
+    toast.success("Lista carregada da seed");
+  }
+
+  function closeSeedModal() {
+    setSeedModalOpen(false);
+    setPendingSeed(null);
+    setSeedError("");
+    setSeedInput("");
   }
 
   if (!isLoaded) {
@@ -217,93 +305,97 @@ function Index() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-ink font-sans text-foreground antialiased">
       {/* Ambient glow */}
-      <div className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[420px] overflow-hidden" aria-hidden="true">
+      <div
+        className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[420px] overflow-hidden"
+        aria-hidden="true"
+      >
         <div className="absolute -left-24 -top-16 size-[440px] rounded-full bg-mint/20 blur-[120px]" />
         <div className="absolute left-1/3 -top-24 size-[420px] rounded-full bg-rose/15 blur-[120px]" />
         <div className="absolute -right-16 top-0 size-[420px] rounded-full bg-aurora/15 blur-[120px]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6">
-        {/* Header / Dashboard */}
-        <header className="sticky top-0 z-20 -mx-4 px-4 pt-5 pb-4 backdrop-blur-xl sm:-mx-6 sm:px-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="grid size-9 place-items-center rounded-xl bg-white/10 ring-1 ring-white/15">
-                <span className="text-[10px] font-semibold tracking-[0.2em] text-muted-foreground">
-                  MC
-                </span>
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold leading-tight text-zinc-50 text-balance">
-                  Minha Lista de Compras
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  Carteira de controle de orçamento
-                </p>
-              </div>
+        {/* Header */}
+        <header className="flex items-center justify-between gap-3 pt-5 pb-3">
+          <div className="flex items-center gap-3">
+            <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-mint/15 ring-1 ring-mint/30">
+              <ShoppingCart className="size-5 text-mint" />
             </div>
-            <span className="hidden items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs text-muted-foreground ring-1 ring-white/10 sm:inline-flex">
-              <span className="size-1.5 rounded-full bg-mint" />
-              Tudo salvo neste navegador
-            </span>
+            <div>
+              <h1 className="text-lg font-semibold leading-tight text-zinc-50 text-balance">
+                Lista de Compras
+              </h1>
+              <p className="text-xs text-muted-foreground">by MarcelloMZ</p>
+            </div>
           </div>
+          <span className="hidden items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs text-muted-foreground ring-1 ring-white/10 sm:inline-flex">
+            <span className="size-1.5 rounded-full bg-mint" />
+            Tudo salvo neste navegador
+          </span>
+        </header>
 
-          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="rounded-xl bg-white/5 p-4 ring-1 ring-white/10">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Saldo Inicial</span>
-                <Pencil className="size-4 text-muted-foreground/60" />
+        {/* Sticky financial dashboard */}
+        <div className="sticky top-0 z-30 -mx-4 border-b border-white/10 bg-ink/95 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="min-w-0 rounded-xl bg-white/5 p-2.5 ring-1 ring-white/10 sm:p-4">
+              <div className="flex items-center justify-between gap-1 text-[11px] text-muted-foreground sm:text-xs">
+                <span className="truncate">Saldo Inicial</span>
+                <Pencil className="size-3.5 shrink-0 text-muted-foreground/60" />
               </div>
-              <div className="mt-2 flex items-baseline gap-1">
-                <span className="text-lg text-muted-foreground">R$</span>
+              <div className="mt-1.5 flex items-baseline gap-1">
+                <span className="text-xs text-muted-foreground sm:text-lg">
+                  R$
+                </span>
                 <input
                   type="text"
                   inputMode="decimal"
                   value={initialBalanceInput}
                   onChange={(e) => setInitialBalanceInput(e.target.value)}
                   onBlur={(e) => handleInitialBalanceChange(e.target.value)}
-                  className="w-full bg-transparent text-2xl font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/40"
+                  className="w-full min-w-0 bg-transparent text-base font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/40 sm:text-2xl"
                   aria-label="Saldo inicial"
                 />
               </div>
             </div>
 
-            <div className="rounded-xl bg-white/5 p-4 ring-1 ring-white/10">
-              <div className="text-xs text-muted-foreground">
-                Valor Total das Compras
+            <div className="min-w-0 rounded-xl bg-white/5 p-2.5 ring-1 ring-white/10 sm:p-4">
+              <div className="truncate text-[11px] text-muted-foreground sm:text-xs">
+                Total das Compras
               </div>
-              <div className="mt-2 flex items-baseline gap-1">
-                <span className="text-lg text-muted-foreground">R$</span>
-                <span className="text-2xl font-semibold tracking-tight text-foreground">
+              <div className="mt-1.5 flex items-baseline gap-1">
+                <span className="text-xs text-muted-foreground sm:text-lg">
+                  R$
+                </span>
+                <span className="truncate text-base font-semibold tracking-tight text-foreground sm:text-2xl">
                   {formatCurrency(totalPurchases)}
                 </span>
               </div>
             </div>
 
             <div
-              className={`rounded-xl p-4 ring-1 ${
+              className={`min-w-0 rounded-xl p-2.5 ring-1 sm:p-4 ${
                 isPositive
                   ? "bg-mint/10 ring-mint/25"
                   : "bg-rose/10 ring-rose/25"
               }`}
             >
               <div
-                className={`text-xs ${
+                className={`truncate text-[11px] sm:text-xs ${
                   isPositive ? "text-mint/80" : "text-rose/80"
                 }`}
               >
                 Saldo Restante
               </div>
-              <div className="mt-2 flex items-baseline gap-1">
+              <div className="mt-1.5 flex items-baseline gap-1">
                 <span
-                  className={`text-lg ${
+                  className={`text-xs sm:text-lg ${
                     isPositive ? "text-mint/70" : "text-rose/70"
                   }`}
                 >
                   R$
                 </span>
                 <span
-                  className={`text-2xl font-semibold tracking-tight ${
+                  className={`truncate text-base font-semibold tracking-tight sm:text-2xl ${
                     isPositive ? "text-mint" : "text-rose"
                   }`}
                 >
@@ -312,10 +404,10 @@ function Index() {
               </div>
             </div>
           </div>
-        </header>
+        </div>
 
         {/* Main content */}
-        <main className="mt-1 grid grid-cols-1 gap-4 pb-12 lg:grid-cols-12">
+        <main className="mt-4 grid grid-cols-1 gap-4 pb-12 lg:grid-cols-12">
           {/* Add / edit product form */}
           <section className="lg:col-span-4">
             <div className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
@@ -323,7 +415,9 @@ function Index() {
                 {editingId ? "Editar produto" : "Adicionar produto"}
               </h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                {editingId ? "Atualize os dados do item" : "Entrada nova na sua carteira"}
+                {editingId
+                  ? "Atualize os dados do item"
+                  : "O preço é preenchido depois, na lista"}
               </p>
               <form onSubmit={handleSubmit} className="mt-4 space-y-3">
                 <label className="block">
@@ -348,42 +442,19 @@ function Index() {
                     className="mt-1 w-full"
                   />
                 </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="block">
-                    <span className="text-xs text-muted-foreground">
-                      Quantidade
-                    </span>
-                    <input
-                      type="number"
-                      min={1}
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value)}
-                      placeholder="2"
-                      className="mt-1 w-full rounded-lg bg-black/30 px-3 py-2 text-sm text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
-                    />
-                  </label>
-                  <label className="block">
-                    <span className="text-xs text-muted-foreground">
-                      Preço unitário
-                    </span>
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={unitPrice}
-                      onChange={(e) => setUnitPrice(e.target.value)}
-                      placeholder="34,90"
-                      className="mt-1 w-full rounded-lg bg-black/30 px-3 py-2 text-sm text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
-                    />
-                  </label>
-                </div>
-                <div className="flex items-center justify-between rounded-lg bg-black/20 px-3 py-2.5 ring-1 ring-white/10">
+                <label className="block">
                   <span className="text-xs text-muted-foreground">
-                    Preço Total
+                    Quantidade
                   </span>
-                  <span className="text-sm font-semibold text-foreground">
-                    R$ {formatCurrency(calculatedTotal)}
-                  </span>
-                </div>
+                  <input
+                    type="number"
+                    min={1}
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    placeholder="2"
+                    className="mt-1 w-full rounded-lg bg-black/30 px-3 py-2 text-sm text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
+                  />
+                </label>
                 <div className="flex gap-2">
                   <button
                     type="submit"
@@ -406,7 +477,44 @@ function Index() {
           </section>
 
           {/* Product list */}
-          <section className="lg:col-span-8">
+          <section className="space-y-4 lg:col-span-8">
+            {/* Share by seed */}
+            <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <h2 className="text-sm font-semibold text-foreground">
+                    Compartilhar lista
+                  </h2>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Copie a seed e envie para alguém recriar sua lista.
+                  </p>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopySeed}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-mint px-3 py-2 text-xs font-semibold text-ink transition hover:opacity-90"
+                  >
+                    <Copy className="size-3.5" />
+                    Copiar seed
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSeedModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground ring-1 ring-white/10 transition hover:bg-white/10"
+                  >
+                    <ClipboardPaste className="size-3.5" />
+                    Carregar seed
+                  </button>
+                </div>
+              </div>
+              <div className="mt-3 overflow-x-auto rounded-lg bg-black/30 px-3 py-2 ring-1 ring-white/10">
+                <code className="block whitespace-nowrap font-mono text-[11px] text-muted-foreground">
+                  {seed}
+                </code>
+              </div>
+            </div>
+
             <div className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -414,10 +522,13 @@ function Index() {
                     Produtos
                   </h2>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    {products.length} {products.length === 1 ? "item registrado" : "itens registrados"}
+                    {products.length}{" "}
+                    {products.length === 1
+                      ? "item registrado"
+                      : "itens registrados"}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <div className="relative flex-1 sm:flex-none">
                     <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
                     <input
@@ -430,7 +541,9 @@ function Index() {
                   </div>
                   <CategorySelect
                     value={filterCategory}
-                    onChange={(value) => setFilterCategory(value as Category | "")}
+                    onChange={(value) =>
+                      setFilterCategory(value as Category | "")
+                    }
                     includeAll
                     className="w-44"
                   />
@@ -455,11 +568,12 @@ function Index() {
                       <>
                         Nenhum produto encontrado
                         {search.trim() && ` para "${search.trim()}"`}
-                        {filterCategory && ` na categoria "${filterCategory}"`}
-                        .
+                        {filterCategory && ` na categoria "${filterCategory}"`}.
                       </>
                     ) : (
-                      <>Nenhum produto na lista ainda. Adicione o primeiro item.</>
+                      <>
+                        Nenhum produto na lista ainda. Adicione o primeiro item.
+                      </>
                     )}
                   </div>
                 ) : (
@@ -477,8 +591,35 @@ function Index() {
                     <tbody className="divide-y divide-white/5">
                       {filteredProducts.map((product) => (
                         <tr key={product.id}>
-                          <td className="py-3 pr-3 font-medium text-foreground">
-                            {product.name}
+                          <td className="py-3 pr-3">
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => togglePurchased(product.id)}
+                                aria-label={
+                                  product.purchased
+                                    ? "Marcar como pendente"
+                                    : "Marcar como comprado"
+                                }
+                                aria-pressed={product.purchased}
+                                className={`grid size-5 shrink-0 place-items-center rounded-md ring-1 transition ${
+                                  product.purchased
+                                    ? "bg-mint text-ink ring-mint/50"
+                                    : "bg-black/30 text-transparent ring-white/15 hover:ring-mint/40"
+                                }`}
+                              >
+                                <Check className="size-3.5" />
+                              </button>
+                              <span
+                                className={`font-medium ${
+                                  product.purchased
+                                    ? "text-muted-foreground line-through"
+                                    : "text-foreground"
+                                }`}
+                              >
+                                {product.name}
+                              </span>
+                            </div>
                           </td>
                           <td className="py-3 pr-3">
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 text-xs text-muted-foreground ring-1 ring-white/10">
@@ -489,8 +630,38 @@ function Index() {
                           <td className="py-3 pr-3 text-right text-muted-foreground">
                             {product.quantity}
                           </td>
-                          <td className="py-3 pr-3 text-right text-muted-foreground">
-                            {formatCurrency(product.unitPrice)}
+                          <td className="py-3 pr-3 text-right">
+                            <div className="inline-flex items-center gap-1 rounded-lg bg-black/30 px-2 py-1 ring-1 ring-white/10 focus-within:ring-2 focus-within:ring-mint/40">
+                              <span className="text-xs text-muted-foreground">
+                                R$
+                              </span>
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                aria-label={`Preço unitário de ${product.name}`}
+                                value={
+                                  priceDrafts[product.id] ??
+                                  formatCurrency(product.unitPrice)
+                                }
+                                onChange={(e) =>
+                                  setPriceDrafts((prev) => ({
+                                    ...prev,
+                                    [product.id]: e.target.value,
+                                  }))
+                                }
+                                onFocus={(e) => e.currentTarget.select()}
+                                onBlur={(e) =>
+                                  handleUnitPriceCommit(
+                                    product.id,
+                                    e.target.value
+                                  )
+                                }
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") e.currentTarget.blur();
+                                }}
+                                className="w-16 bg-transparent text-right text-sm text-foreground outline-none"
+                              />
+                            </div>
                           </td>
                           <td className="py-3 pr-3 text-right font-semibold text-foreground">
                             {formatCurrency(product.quantity * product.unitPrice)}
@@ -555,6 +726,92 @@ function Index() {
           </section>
         </main>
       </div>
+
+      {/* Load seed modal */}
+      {seedModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Carregar seed"
+            className="w-full max-w-md rounded-2xl bg-panel p-5 ring-1 ring-white/10"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">
+                  Carregar seed
+                </h3>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Cole a seed recebida para recriar a lista.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeSeedModal}
+                aria-label="Fechar"
+                className="rounded-md p-1 text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <textarea
+              value={seedInput}
+              onChange={(e) => {
+                setSeedInput(e.target.value);
+                setSeedError("");
+                setPendingSeed(null);
+              }}
+              rows={4}
+              placeholder="LC1...."
+              aria-label="Seed"
+              className="mt-4 w-full resize-none rounded-lg bg-black/30 px-3 py-2 font-mono text-xs text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
+            />
+
+            {seedError && (
+              <p className="mt-2 text-xs text-rose" role="alert">
+                {seedError}
+              </p>
+            )}
+
+            {pendingSeed && (
+              <div className="mt-3 rounded-lg bg-rose/10 p-3 text-xs text-rose ring-1 ring-rose/25">
+                Sua lista atual será substituída por{" "}
+                {pendingSeed.products.length}{" "}
+                {pendingSeed.products.length === 1 ? "produto" : "produtos"} da
+                seed. Deseja continuar?
+              </div>
+            )}
+
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeSeedModal}
+                className="rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground ring-1 ring-white/10 transition hover:bg-white/10"
+              >
+                Cancelar
+              </button>
+              {pendingSeed ? (
+                <button
+                  type="button"
+                  onClick={handleConfirmSeed}
+                  className="rounded-lg bg-mint px-3 py-2 text-xs font-semibold text-ink transition hover:opacity-90"
+                >
+                  Substituir lista
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleValidateSeed}
+                  className="rounded-lg bg-mint px-3 py-2 text-xs font-semibold text-ink transition hover:opacity-90"
+                >
+                  Carregar
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
