@@ -67,6 +67,13 @@
   --color-mint: var(--mint);
   --color-rose: var(--rose);
   --color-aurora: var(--aurora);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-field: var(--field);
+  --color-hairline: var(--hairline);
+  --color-heading: var(--heading);
+  --color-onprimary: var(--onprimary);
+  --color-overlay: var(--overlay);
 }
 
 :root {
@@ -147,6 +154,97 @@
   --sidebar-accent-foreground: oklch(0.93 0.01 270);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: var(--mint);
+
+  /* Surface tokens shared by every theme */
+  --surface: oklch(1 0 0 / 5%);
+  --surface-hover: oklch(1 0 0 / 10%);
+  --field: oklch(0 0 0 / 30%);
+  --hairline: oklch(1 0 0 / 12%);
+  --heading: oklch(0.98 0 0);
+  --onprimary: var(--ink);
+  --overlay: oklch(0 0 0 / 70%);
+  --glow: 1;
+}
+
+/* ============================================================
+   Themes — each block only overrides the palette primitives.
+   Everything else cascades from :root.
+   ============================================================ */
+
+.theme-dark-green {
+  --ink: oklch(0.08 0.02 270);
+  --panel: oklch(0.15 0.02 270);
+  --line: oklch(0.28 0.03 270);
+  --mint: oklch(0.72 0.18 158);
+  --rose: oklch(0.68 0.19 22);
+  --aurora: oklch(0.78 0.12 220);
+  --foreground: oklch(0.93 0.01 270);
+  --muted-foreground: oklch(0.65 0.02 270);
+  --surface: oklch(1 0 0 / 5%);
+  --surface-hover: oklch(1 0 0 / 10%);
+  --field: oklch(0 0 0 / 30%);
+  --hairline: oklch(1 0 0 / 12%);
+  --heading: oklch(0.98 0 0);
+  --onprimary: oklch(0.08 0.02 270);
+  --overlay: oklch(0 0 0 / 70%);
+  --glow: 1;
+}
+
+.theme-dark-blue {
+  --ink: oklch(0.19 0.05 258);
+  --panel: oklch(0.26 0.05 258);
+  --line: oklch(0.34 0.05 258);
+  --mint: oklch(0.68 0.15 250);
+  --rose: oklch(0.68 0.19 22);
+  --aurora: oklch(0.78 0.1 215);
+  --foreground: oklch(0.94 0.01 258);
+  --muted-foreground: oklch(0.72 0.03 258);
+  --surface: oklch(1 0 0 / 7%);
+  --surface-hover: oklch(1 0 0 / 13%);
+  --field: oklch(0.14 0.04 258 / 55%);
+  --hairline: oklch(1 0 0 / 14%);
+  --heading: oklch(0.99 0 0);
+  --onprimary: oklch(0.15 0.04 258);
+  --overlay: oklch(0.1 0.03 258 / 72%);
+  --glow: 1;
+}
+
+.theme-light-blue {
+  --ink: oklch(1 0 0);
+  --panel: oklch(0.98 0.004 250);
+  --line: oklch(0.92 0.006 250);
+  --mint: oklch(0.55 0.18 255);
+  --rose: oklch(0.55 0.21 25);
+  --aurora: oklch(0.62 0.12 230);
+  --foreground: oklch(0.25 0.02 260);
+  --muted-foreground: oklch(0.52 0.02 260);
+  --surface: oklch(0.97 0.005 250);
+  --surface-hover: oklch(0.93 0.01 250);
+  --field: oklch(0.985 0.003 250);
+  --hairline: oklch(0.25 0.02 260 / 14%);
+  --heading: oklch(0.2 0.02 260);
+  --onprimary: oklch(0.99 0 0);
+  --overlay: oklch(0.25 0.02 260 / 45%);
+  --glow: 0.3;
+}
+
+.theme-light-green {
+  --ink: oklch(1 0 0);
+  --panel: oklch(0.97 0.005 155);
+  --line: oklch(0.92 0.008 155);
+  --mint: oklch(0.55 0.14 158);
+  --rose: oklch(0.55 0.21 25);
+  --aurora: oklch(0.62 0.1 200);
+  --foreground: oklch(0.25 0.02 160);
+  --muted-foreground: oklch(0.52 0.02 160);
+  --surface: oklch(0.96 0.006 155);
+  --surface-hover: oklch(0.92 0.012 155);
+  --field: oklch(0.98 0.004 155);
+  --hairline: oklch(0.25 0.02 160 / 14%);
+  --heading: oklch(0.2 0.02 160);
+  --onprimary: oklch(0.99 0 0);
+  --overlay: oklch(0.25 0.02 160 / 45%);
+  --glow: 0.3;
 }
 
 @layer base {
@@ -183,6 +281,6 @@
   select option:hover,
   select:focus option:checked {
     background-color: var(--mint);
-    color: var(--ink);
+    color: var(--onprimary);
   }
 }
