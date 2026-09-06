@@ -224,6 +224,18 @@ function Index() {
     if (editingId === id) resetForm();
   }
 
+  function handleClearAll() {
+    setProducts([]);
+    setPriceDrafts({});
+    if (editingId) resetForm();
+    setClearModalOpen(false);
+    toast.success("Lista apagada");
+  }
+
+  function closeClearModal() {
+    setClearModalOpen(false);
+  }
+
   function handleUnitPriceCommit(id: string, raw: string) {
     const price = currencyInputToNumber(raw);
     setProducts((prev) =>
