@@ -96,6 +96,8 @@ function Index() {
   const [seedError, setSeedError] = useState("");
   const [pendingSeed, setPendingSeed] = useState<PersistedData | null>(null);
 
+  const [clearModalOpen, setClearModalOpen] = useState(false);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
