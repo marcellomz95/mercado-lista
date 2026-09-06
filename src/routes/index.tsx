@@ -536,16 +536,30 @@ function Index() {
 
             <div className="rounded-2xl bg-surface p-5 ring-1 ring-hairline">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">
-                    Produtos
-                  </h2>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {products.length}{" "}
-                    {products.length === 1
-                      ? "item registrado"
-                      : "itens registrados"}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div>
+                    <h2 className="text-sm font-semibold text-foreground">
+                      Produtos
+                    </h2>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {products.length}{" "}
+                      {products.length === 1
+                        ? "item registrado"
+                        : "itens registrados"}
+                    </p>
+                  </div>
+                  {products.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setClearModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-rose/10 px-2.5 py-1.5 text-xs font-semibold text-rose ring-1 ring-rose/25 transition hover:bg-rose/20"
+                      aria-label="Apagar todos os itens"
+                      title="Apagar todos os itens"
+                    >
+                      <Trash2 className="size-3.5" />
+                      <span className="hidden sm:inline">Limpar lista</span>
+                    </button>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="relative flex-1 sm:flex-none">
