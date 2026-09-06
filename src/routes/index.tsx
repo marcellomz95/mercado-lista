@@ -85,8 +85,9 @@ function Index() {
   const [sortBy, setSortBy] = useState<"name" | "value" | "category">("name");
   const [filterCategory, setFilterCategory] = useState<Category | "">("");
   const [priceDrafts, setPriceDrafts] = useState<Record<string, string>>({});
+  const [nameDrafts, setNameDrafts] = useState<Record<string, string>>({});
+  const [qtyDrafts, setQtyDrafts] = useState<Record<string, string>>({});
 
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category>("Outros");
   const [quantity, setQuantity] = useState("");
@@ -176,7 +177,6 @@ function Index() {
   }, [products, search, sortBy, filterCategory]);
 
   function resetForm() {
-    setEditingId(null);
     setName("");
     setCategory("Outros");
     setQuantity("");
@@ -188,46 +188,57 @@ function Index() {
 
     if (!name.trim() || qty <= 0) return;
 
-    if (editingId) {
-      setProducts((prev) =>
-        prev.map((product) =>
-          product.id === editingId
-            ? { ...product, name: name.trim(), category, quantity: qty }
-            : product
-        )
-      );
-    } else {
-      setProducts((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          name: name.trim(),
-          category,
-          quantity: qty,
-          unitPrice: 0,
-          purchased: false,
-        },
-      ]);
-    }
+    setProducts((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        name: name.trim(),
+        category,
+        quantity: qty,
+        unitPrice: 0,
+        purchased: false,
+      },
+    ]);
     resetForm();
   }
 
-  function handleEdit(product: Product) {
-    setEditingId(product.id);
-    setName(product.name);
-    setCategory(product.category);
-    setQuantity(product.quantity.toString());
+  function updateProduct(id: string, patch: Partial<Product>) {
+    setProducts((prev) =>
+      prev.map((product) =>
+        product.id === id ? { ...product, ...patch } : product
+      )
+    );
+  }
+
+  function handleNameCommit(id: string, raw: string) {
+    const value = raw.trim();
+    if (value) updateProduct(id, { name: value });
+    setNameDrafts((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+
+  function handleQtyCommit(id: string, raw: string) {
+    const qty = parseInt(raw, 10);
+    if (qty > 0) updateProduct(id, { quantity: qty });
+    setQtyDrafts((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
   }
 
   function handleDelete(id: string) {
     setProducts((prev) => prev.filter((product) => product.id !== id));
-    if (editingId === id) resetForm();
   }
 
   function handleClearAll() {
     setProducts([]);
     setPriceDrafts({});
-    if (editingId) resetForm();
+    setNameDrafts({});
+    setQtyDrafts({});
     setClearModalOpen(false);
     toast.success("Lista apagada");
   }
