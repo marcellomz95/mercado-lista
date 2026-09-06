@@ -88,23 +88,23 @@
   --aurora: oklch(0.78 0.12 220);
 
   --background: var(--ink);
-  --foreground: oklch(0.93 0.01 270);
+  --foreground: var(--foreground);
   --card: var(--panel);
-  --card-foreground: oklch(0.93 0.01 270);
+  --card-foreground: var(--foreground);
   --popover: var(--panel);
-  --popover-foreground: oklch(0.93 0.01 270);
+  --popover-foreground: var(--foreground);
   --primary: var(--mint);
-  --primary-foreground: var(--ink);
+  --primary-foreground: var(--onprimary);
   --secondary: var(--line);
-  --secondary-foreground: oklch(0.93 0.01 270);
+  --secondary-foreground: var(--foreground);
   --muted: var(--line);
   --muted-foreground: oklch(0.65 0.02 270);
   --accent: var(--aurora);
-  --accent-foreground: var(--ink);
+  --accent-foreground: var(--onprimary);
   --destructive: var(--rose);
-  --destructive-foreground: oklch(0.98 0.01 270);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 10%);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: var(--hairline);
+  --input: var(--hairline);
   --ring: var(--mint);
   --chart-1: var(--mint);
   --chart-2: var(--aurora);
@@ -112,34 +112,34 @@
   --chart-4: oklch(0.78 0.15 80);
   --chart-5: oklch(0.65 0.12 300);
   --sidebar: var(--panel);
-  --sidebar-foreground: oklch(0.93 0.01 270);
+  --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--mint);
-  --sidebar-primary-foreground: var(--ink);
+  --sidebar-primary-foreground: var(--onprimary);
   --sidebar-accent: var(--line);
-  --sidebar-accent-foreground: oklch(0.93 0.01 270);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--hairline);
   --sidebar-ring: var(--mint);
 }
 
 .dark {
   --background: var(--ink);
-  --foreground: oklch(0.93 0.01 270);
+  --foreground: var(--foreground);
   --card: var(--panel);
-  --card-foreground: oklch(0.93 0.01 270);
+  --card-foreground: var(--foreground);
   --popover: var(--panel);
-  --popover-foreground: oklch(0.93 0.01 270);
+  --popover-foreground: var(--foreground);
   --primary: var(--mint);
-  --primary-foreground: var(--ink);
+  --primary-foreground: var(--onprimary);
   --secondary: var(--line);
-  --secondary-foreground: oklch(0.93 0.01 270);
+  --secondary-foreground: var(--foreground);
   --muted: var(--line);
   --muted-foreground: oklch(0.65 0.02 270);
   --accent: var(--aurora);
-  --accent-foreground: var(--ink);
+  --accent-foreground: var(--onprimary);
   --destructive: var(--rose);
-  --destructive-foreground: oklch(0.98 0.01 270);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 10%);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: var(--hairline);
+  --input: var(--hairline);
   --ring: var(--mint);
   --chart-1: var(--mint);
   --chart-2: var(--aurora);
@@ -147,12 +147,12 @@
   --chart-4: oklch(0.78 0.15 80);
   --chart-5: oklch(0.65 0.12 300);
   --sidebar: var(--panel);
-  --sidebar-foreground: oklch(0.93 0.01 270);
+  --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--mint);
-  --sidebar-primary-foreground: var(--ink);
+  --sidebar-primary-foreground: var(--onprimary);
   --sidebar-accent: var(--line);
-  --sidebar-accent-foreground: oklch(0.93 0.01 270);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--hairline);
   --sidebar-ring: var(--mint);
 
   /* Surface tokens shared by every theme */
@@ -178,7 +178,7 @@
   --mint: oklch(0.72 0.18 158);
   --rose: oklch(0.68 0.19 22);
   --aurora: oklch(0.78 0.12 220);
-  --foreground: oklch(0.93 0.01 270);
+  --foreground: var(--foreground);
   --muted-foreground: oklch(0.65 0.02 270);
   --surface: oklch(1 0 0 / 5%);
   --surface-hover: oklch(1 0 0 / 10%);

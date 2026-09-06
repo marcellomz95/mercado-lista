@@ -17,6 +17,7 @@ import {
   type Category,
 } from "@/components/CategorySelect";
 import { decodeSeed, encodeSeed } from "@/lib/seed";
+import { ThemeSelect } from "@/components/ThemeSelect";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -296,17 +297,18 @@ function Index() {
 
   if (!isLoaded) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-ink">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-mint border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-ink font-sans text-foreground antialiased">
+    <div className="relative min-h-screen overflow-x-hidden bg-background font-sans text-foreground antialiased">
       {/* Ambient glow */}
       <div
         className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[420px] overflow-hidden"
+        style={{ opacity: "var(--glow)" }}
         aria-hidden="true"
       >
         <div className="absolute -left-24 -top-16 size-[440px] rounded-full bg-mint/20 blur-[120px]" />
@@ -322,22 +324,25 @@ function Index() {
               <ShoppingCart className="size-5 text-mint" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold leading-tight text-zinc-50 text-balance">
+              <h1 className="text-lg font-semibold leading-tight text-heading text-balance">
                 Lista de Compras
               </h1>
               <p className="text-xs text-muted-foreground">by MarcelloMZ</p>
             </div>
           </div>
-          <span className="hidden items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs text-muted-foreground ring-1 ring-white/10 sm:inline-flex">
-            <span className="size-1.5 rounded-full bg-mint" />
-            Tudo salvo neste navegador
-          </span>
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="hidden items-center gap-2 rounded-full bg-surface px-3 py-1.5 text-xs text-muted-foreground ring-1 ring-hairline lg:inline-flex">
+              <span className="size-1.5 rounded-full bg-mint" />
+              Tudo salvo neste navegador
+            </span>
+            <ThemeSelect />
+          </div>
         </header>
 
         {/* Sticky financial dashboard */}
-        <div className="sticky top-0 z-30 -mx-4 border-b border-white/10 bg-ink/95 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
+        <div className="sticky top-0 z-30 -mx-4 border-b border-hairline bg-background/95 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
-            <div className="min-w-0 rounded-xl bg-white/5 p-2.5 ring-1 ring-white/10 sm:p-4">
+            <div className="min-w-0 rounded-xl bg-surface p-2.5 ring-1 ring-hairline sm:p-4">
               <div className="flex items-center justify-between gap-1 text-[11px] text-muted-foreground sm:text-xs">
                 <span className="truncate">Saldo Inicial</span>
                 <Pencil className="size-3.5 shrink-0 text-muted-foreground/60" />
@@ -358,7 +363,7 @@ function Index() {
               </div>
             </div>
 
-            <div className="min-w-0 rounded-xl bg-white/5 p-2.5 ring-1 ring-white/10 sm:p-4">
+            <div className="min-w-0 rounded-xl bg-surface p-2.5 ring-1 ring-hairline sm:p-4">
               <div className="truncate text-[11px] text-muted-foreground sm:text-xs">
                 Total das Compras
               </div>
@@ -410,7 +415,7 @@ function Index() {
         <main className="mt-4 grid grid-cols-1 gap-4 pb-12 lg:grid-cols-12">
           {/* Add / edit product form */}
           <section className="lg:col-span-4">
-            <div className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
+            <div className="rounded-2xl bg-surface p-5 ring-1 ring-hairline">
               <h2 className="text-sm font-semibold text-foreground">
                 {editingId ? "Editar produto" : "Adicionar produto"}
               </h2>
@@ -429,7 +434,7 @@ function Index() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex.: Café especial"
-                    className="mt-1 w-full rounded-lg bg-black/30 px-3 py-2 text-sm text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
+                    className="mt-1 w-full rounded-lg bg-field px-3 py-2 text-sm text-foreground ring-1 ring-hairline placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
                   />
                 </label>
                 <label className="block">
@@ -452,13 +457,13 @@ function Index() {
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     placeholder="2"
-                    className="mt-1 w-full rounded-lg bg-black/30 px-3 py-2 text-sm text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
+                    className="mt-1 w-full rounded-lg bg-field px-3 py-2 text-sm text-foreground ring-1 ring-hairline placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
                   />
                 </label>
                 <div className="flex gap-2">
                   <button
                     type="submit"
-                    className="flex-1 rounded-lg bg-mint py-2.5 text-sm font-semibold text-ink ring-1 ring-mint/40 transition hover:opacity-90 active:opacity-80"
+                    className="flex-1 rounded-lg bg-mint py-2.5 text-sm font-semibold text-onprimary ring-1 ring-mint/40 transition hover:opacity-90 active:opacity-80"
                   >
                     {editingId ? "Salvar alterações" : "Adicionar à lista"}
                   </button>
@@ -466,7 +471,7 @@ function Index() {
                     <button
                       type="button"
                       onClick={resetForm}
-                      className="rounded-lg bg-secondary px-4 py-2.5 text-sm font-semibold text-secondary-foreground ring-1 ring-white/10 transition hover:bg-white/10"
+                      className="rounded-lg bg-secondary px-4 py-2.5 text-sm font-semibold text-secondary-foreground ring-1 ring-hairline transition hover:bg-surface-hover"
                     >
                       Cancelar
                     </button>
@@ -479,7 +484,7 @@ function Index() {
           {/* Product list */}
           <section className="space-y-4 lg:col-span-8">
             {/* Share by seed */}
-            <div className="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+            <div className="rounded-2xl bg-surface p-4 ring-1 ring-hairline">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <h2 className="text-sm font-semibold text-foreground">
@@ -493,7 +498,7 @@ function Index() {
                   <button
                     type="button"
                     onClick={handleCopySeed}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-mint px-3 py-2 text-xs font-semibold text-ink transition hover:opacity-90"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-mint px-3 py-2 text-xs font-semibold text-onprimary transition hover:opacity-90"
                   >
                     <Copy className="size-3.5" />
                     Copiar seed
@@ -501,21 +506,21 @@ function Index() {
                   <button
                     type="button"
                     onClick={() => setSeedModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground ring-1 ring-white/10 transition hover:bg-white/10"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground ring-1 ring-hairline transition hover:bg-surface-hover"
                   >
                     <ClipboardPaste className="size-3.5" />
                     Carregar seed
                   </button>
                 </div>
               </div>
-              <div className="mt-3 overflow-x-auto rounded-lg bg-black/30 px-3 py-2 ring-1 ring-white/10">
+              <div className="mt-3 overflow-x-auto rounded-lg bg-field px-3 py-2 ring-1 ring-hairline">
                 <code className="block whitespace-nowrap font-mono text-[11px] text-muted-foreground">
                   {seed}
                 </code>
               </div>
             </div>
 
-            <div className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
+            <div className="rounded-2xl bg-surface p-5 ring-1 ring-hairline">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-sm font-semibold text-foreground">
@@ -536,7 +541,7 @@ function Index() {
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       placeholder="Pesquisar produto"
-                      className="w-full rounded-lg bg-black/30 py-2 pl-9 pr-3 text-sm text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none sm:w-48"
+                      className="w-full rounded-lg bg-field py-2 pl-9 pr-3 text-sm text-foreground ring-1 ring-hairline placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none sm:w-48"
                     />
                   </div>
                   <CategorySelect
@@ -552,7 +557,7 @@ function Index() {
                     onChange={(e) =>
                       setSortBy(e.target.value as "name" | "value" | "category")
                     }
-                    className="rounded-lg bg-black/30 py-2 pl-3 pr-8 text-sm text-foreground ring-1 ring-white/10 focus:ring-2 focus:ring-mint/40 focus:outline-none"
+                    className="rounded-lg bg-field py-2 pl-3 pr-8 text-sm text-foreground ring-1 ring-hairline focus:ring-2 focus:ring-mint/40 focus:outline-none"
                   >
                     <option value="name">Nome</option>
                     <option value="category">Categoria</option>
@@ -563,7 +568,7 @@ function Index() {
 
               <div className="mt-4 overflow-x-auto">
                 {filteredProducts.length === 0 ? (
-                  <div className="rounded-lg bg-black/20 py-10 text-center text-sm text-muted-foreground ring-1 ring-white/10">
+                  <div className="rounded-lg bg-field py-10 text-center text-sm text-muted-foreground ring-1 ring-hairline">
                     {search.trim() || filterCategory ? (
                       <>
                         Nenhum produto encontrado
@@ -588,7 +593,7 @@ function Index() {
                         <th className="pb-2 text-right font-medium">Ações</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-hairline">
                       {filteredProducts.map((product) => (
                         <tr key={product.id}>
                           <td className="py-3 pr-3">
@@ -604,8 +609,8 @@ function Index() {
                                 aria-pressed={product.purchased}
                                 className={`grid size-5 shrink-0 place-items-center rounded-md ring-1 transition ${
                                   product.purchased
-                                    ? "bg-mint text-ink ring-mint/50"
-                                    : "bg-black/30 text-transparent ring-white/15 hover:ring-mint/40"
+                                    ? "bg-mint text-onprimary ring-mint/50"
+                                    : "bg-field text-transparent ring-hairline hover:ring-mint/40"
                                 }`}
                               >
                                 <Check className="size-3.5" />
@@ -622,7 +627,7 @@ function Index() {
                             </div>
                           </td>
                           <td className="py-3 pr-3">
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 text-xs text-muted-foreground ring-1 ring-white/10">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-hover px-2 py-0.5 text-xs text-muted-foreground ring-1 ring-hairline">
                               {CATEGORY_ICONS[product.category]}
                               {product.category}
                             </span>
@@ -631,7 +636,7 @@ function Index() {
                             {product.quantity}
                           </td>
                           <td className="py-3 pr-3 text-right">
-                            <div className="inline-flex items-center gap-1 rounded-lg bg-black/30 px-2 py-1 ring-1 ring-white/10 focus-within:ring-2 focus-within:ring-mint/40">
+                            <div className="inline-flex items-center gap-1 rounded-lg bg-field px-2 py-1 ring-1 ring-hairline focus-within:ring-2 focus-within:ring-mint/40">
                               <span className="text-xs text-muted-foreground">
                                 R$
                               </span>
@@ -670,14 +675,14 @@ function Index() {
                             <div className="inline-flex gap-1">
                               <button
                                 onClick={() => handleEdit(product)}
-                                className="rounded-md p-1.5 text-muted-foreground ring-1 ring-white/10 transition hover:bg-white/10 hover:text-foreground"
+                                className="rounded-md p-1.5 text-muted-foreground ring-1 ring-hairline transition hover:bg-surface-hover hover:text-foreground"
                                 aria-label="Editar"
                               >
                                 <Pencil className="size-4" />
                               </button>
                               <button
                                 onClick={() => handleDelete(product.id)}
-                                className="rounded-md p-1.5 text-muted-foreground ring-1 ring-white/10 transition hover:bg-rose/10 hover:text-rose"
+                                className="rounded-md p-1.5 text-muted-foreground ring-1 ring-hairline transition hover:bg-rose/10 hover:text-rose"
                                 aria-label="Excluir"
                               >
                                 <Trash2 className="size-4" />
@@ -692,7 +697,7 @@ function Index() {
               </div>
 
               {/* Financial summary */}
-              <div className="mt-4 grid grid-cols-3 gap-3 border-t border-white/10 pt-4">
+              <div className="mt-4 grid grid-cols-3 gap-3 border-t border-hairline pt-4">
                 <div>
                   <div className="text-xs text-muted-foreground">
                     Total de itens
@@ -729,12 +734,12 @@ function Index() {
 
       {/* Load seed modal */}
       {seedModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
           <div
             role="dialog"
             aria-modal="true"
             aria-label="Carregar seed"
-            className="w-full max-w-md rounded-2xl bg-panel p-5 ring-1 ring-white/10"
+            className="w-full max-w-md rounded-2xl bg-panel p-5 ring-1 ring-hairline"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -749,7 +754,7 @@ function Index() {
                 type="button"
                 onClick={closeSeedModal}
                 aria-label="Fechar"
-                className="rounded-md p-1 text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
+                className="rounded-md p-1 text-muted-foreground transition hover:bg-surface-hover hover:text-foreground"
               >
                 <X className="size-4" />
               </button>
@@ -765,7 +770,7 @@ function Index() {
               rows={4}
               placeholder="LC1...."
               aria-label="Seed"
-              className="mt-4 w-full resize-none rounded-lg bg-black/30 px-3 py-2 font-mono text-xs text-foreground ring-1 ring-white/10 placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
+              className="mt-4 w-full resize-none rounded-lg bg-field px-3 py-2 font-mono text-xs text-foreground ring-1 ring-hairline placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
             />
 
             {seedError && (
@@ -787,7 +792,7 @@ function Index() {
               <button
                 type="button"
                 onClick={closeSeedModal}
-                className="rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground ring-1 ring-white/10 transition hover:bg-white/10"
+                className="rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground ring-1 ring-hairline transition hover:bg-surface-hover"
               >
                 Cancelar
               </button>
@@ -795,7 +800,7 @@ function Index() {
                 <button
                   type="button"
                   onClick={handleConfirmSeed}
-                  className="rounded-lg bg-mint px-3 py-2 text-xs font-semibold text-ink transition hover:opacity-90"
+                  className="rounded-lg bg-mint px-3 py-2 text-xs font-semibold text-onprimary transition hover:opacity-90"
                 >
                   Substituir lista
                 </button>
@@ -803,7 +808,7 @@ function Index() {
                 <button
                   type="button"
                   onClick={handleValidateSeed}
-                  className="rounded-lg bg-mint px-3 py-2 text-xs font-semibold text-ink transition hover:opacity-90"
+                  className="rounded-lg bg-mint px-3 py-2 text-xs font-semibold text-onprimary transition hover:opacity-90"
                 >
                   Carregar
                 </button>
