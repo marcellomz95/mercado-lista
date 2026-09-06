@@ -442,12 +442,10 @@ function Index() {
           <section className="lg:col-span-4">
             <div className="rounded-2xl bg-surface p-5 ring-1 ring-hairline">
               <h2 className="text-sm font-semibold text-foreground">
-                {editingId ? "Editar produto" : "Adicionar produto"}
+                Adicionar produto
               </h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                {editingId
-                  ? "Atualize os dados do item"
-                  : "O preço é preenchido depois, na lista"}
+                O preço é preenchido depois, na lista
               </p>
               <form onSubmit={handleSubmit} className="mt-4 space-y-3">
                 <label className="block">
@@ -485,23 +483,12 @@ function Index() {
                     className="mt-1 w-full rounded-lg bg-field px-3 py-2 text-sm text-foreground ring-1 ring-hairline placeholder:text-muted-foreground/40 focus:ring-2 focus:ring-mint/40 focus:outline-none"
                   />
                 </label>
-                <div className="flex gap-2">
-                  <button
-                    type="submit"
-                    className="flex-1 rounded-lg bg-mint py-2.5 text-sm font-semibold text-onprimary ring-1 ring-mint/40 transition hover:opacity-90 active:opacity-80"
-                  >
-                    {editingId ? "Salvar alterações" : "Adicionar à lista"}
-                  </button>
-                  {editingId && (
-                    <button
-                      type="button"
-                      onClick={resetForm}
-                      className="rounded-lg bg-secondary px-4 py-2.5 text-sm font-semibold text-secondary-foreground ring-1 ring-hairline transition hover:bg-surface-hover"
-                    >
-                      Cancelar
-                    </button>
-                  )}
-                </div>
+                <button
+                  type="submit"
+                  className="w-full rounded-lg bg-mint py-2.5 text-sm font-semibold text-onprimary ring-1 ring-mint/40 transition hover:opacity-90 active:opacity-80"
+                >
+                  Adicionar à lista
+                </button>
               </form>
             </div>
           </section>
