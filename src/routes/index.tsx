@@ -760,6 +760,51 @@ function Index() {
         </main>
       </div>
 
+      {/* Clear all confirmation modal */}
+      {clearModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Apagar todos os itens"
+            className="w-full max-w-sm rounded-2xl bg-panel p-5 ring-1 ring-hairline"
+          >
+            <div className="flex items-start gap-3">
+              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-rose/10 ring-1 ring-rose/25">
+                <Trash2 className="size-5 text-rose" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">
+                  Apagar todos os itens?
+                </h3>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  Todos os {products.length}{" "}
+                  {products.length === 1 ? "produto" : "produtos"} serão
+                  removidos da lista. Essa ação não pode ser desfeita.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeClearModal}
+                className="rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground ring-1 ring-hairline transition hover:bg-surface-hover"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleClearAll}
+                className="rounded-lg bg-rose px-3 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+              >
+                Apagar tudo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Load seed modal */}
       {seedModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
