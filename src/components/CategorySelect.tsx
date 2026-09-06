@@ -110,7 +110,7 @@ export function CategorySelect({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between gap-2 rounded-lg bg-black/30 py-2 pl-3 pr-2 text-sm text-foreground ring-1 ring-white/10 transition hover:bg-white/5 focus:ring-2 focus:ring-mint/40 focus:outline-none"
+        className="flex w-full items-center justify-between gap-2 rounded-lg bg-field py-2 pl-3 pr-2 text-sm text-foreground ring-1 ring-hairline transition hover:bg-surface focus:ring-2 focus:ring-mint/40 focus:outline-none"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -131,7 +131,7 @@ export function CategorySelect({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-panel py-1 ring-1 ring-white/10 shadow-xl">
+        <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-panel py-1 ring-1 ring-hairline shadow-xl">
           {includeAll && (
             <button
               type="button"
