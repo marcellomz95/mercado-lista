@@ -96,6 +96,8 @@ function Index() {
   const [seedError, setSeedError] = useState("");
   const [pendingSeed, setPendingSeed] = useState<PersistedData | null>(null);
 
+  const [clearModalOpen, setClearModalOpen] = useState(false);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -220,6 +222,18 @@ function Index() {
   function handleDelete(id: string) {
     setProducts((prev) => prev.filter((product) => product.id !== id));
     if (editingId === id) resetForm();
+  }
+
+  function handleClearAll() {
+    setProducts([]);
+    setPriceDrafts({});
+    if (editingId) resetForm();
+    setClearModalOpen(false);
+    toast.success("Lista apagada");
+  }
+
+  function closeClearModal() {
+    setClearModalOpen(false);
   }
 
   function handleUnitPriceCommit(id: string, raw: string) {
@@ -522,16 +536,30 @@ function Index() {
 
             <div className="rounded-2xl bg-surface p-5 ring-1 ring-hairline">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">
-                    Produtos
-                  </h2>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {products.length}{" "}
-                    {products.length === 1
-                      ? "item registrado"
-                      : "itens registrados"}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div>
+                    <h2 className="text-sm font-semibold text-foreground">
+                      Produtos
+                    </h2>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {products.length}{" "}
+                      {products.length === 1
+                        ? "item registrado"
+                        : "itens registrados"}
+                    </p>
+                  </div>
+                  {products.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setClearModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-rose/10 px-2.5 py-1.5 text-xs font-semibold text-rose ring-1 ring-rose/25 transition hover:bg-rose/20"
+                      aria-label="Apagar todos os itens"
+                      title="Apagar todos os itens"
+                    >
+                      <Trash2 className="size-3.5" />
+                      <span className="hidden sm:inline">Limpar lista</span>
+                    </button>
+                  )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="relative flex-1 sm:flex-none">
@@ -731,6 +759,51 @@ function Index() {
           </section>
         </main>
       </div>
+
+      {/* Clear all confirmation modal */}
+      {clearModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Apagar todos os itens"
+            className="w-full max-w-sm rounded-2xl bg-panel p-5 ring-1 ring-hairline"
+          >
+            <div className="flex items-start gap-3">
+              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-rose/10 ring-1 ring-rose/25">
+                <Trash2 className="size-5 text-rose" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">
+                  Apagar todos os itens?
+                </h3>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  Todos os {products.length}{" "}
+                  {products.length === 1 ? "produto" : "produtos"} serão
+                  removidos da lista. Essa ação não pode ser desfeita.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeClearModal}
+                className="rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground ring-1 ring-hairline transition hover:bg-surface-hover"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleClearAll}
+                className="rounded-lg bg-rose px-3 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+              >
+                Apagar tudo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Load seed modal */}
       {seedModalOpen && (
