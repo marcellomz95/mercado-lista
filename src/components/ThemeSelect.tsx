@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, Monitor, Moon, Palette, Sun } from "lucide-react";
-import { THEME_OPTIONS, useTheme, type ThemeId } from "@/lib/theme";
+import {
+  THEME_OPTIONS,
+  useTheme,
+  type ThemeId,
+  type ThemeOption,
+} from "@/lib/theme";
 
 const THEME_ICONS: Record<ThemeId, React.ReactNode> = {
   system: <Monitor size={16} />,
@@ -29,8 +34,8 @@ export function ThemeSelect() {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const current =
-    THEME_OPTIONS.find((option) => option.id === theme) ?? THEME_OPTIONS[0];
+  const current: ThemeOption =
+    THEME_OPTIONS.find((option) => option.id === theme) ?? THEME_OPTIONS[1]!;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
