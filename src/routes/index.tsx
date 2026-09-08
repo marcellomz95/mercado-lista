@@ -277,9 +277,13 @@ function Index() {
     );
   }
 
-  function isEditing(id: string, field: typeof editingCell extends infer T ? T extends { field: infer F } ? F : never : never) {
+  function isEditing(
+    id: string,
+    field: "name" | "category" | "quantity" | "unitPrice"
+  ) {
     return editingCell?.id === id && editingCell?.field === field;
   }
+
 
   function startEditing(
     id: string,
