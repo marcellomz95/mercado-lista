@@ -616,7 +616,9 @@ function Index() {
                         <th className="pb-2 text-right font-medium">Qtd</th>
                         <th className="pb-2 text-right font-medium">Unit.</th>
                         <th className="pb-2 text-right font-medium">Total</th>
-                        <th className="pb-2 text-right font-medium">Ações</th>
+                        <th className="pb-2 text-right font-medium">
+                          <span className="sr-only">Excluir</span>
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-hairline">
@@ -740,22 +742,13 @@ function Index() {
                             {formatCurrency(product.quantity * product.unitPrice)}
                           </td>
                           <td className="py-3 text-right">
-                            <div className="inline-flex gap-1">
-                              <button
-                                onClick={() => handleEdit(product)}
-                                className="rounded-md p-1.5 text-muted-foreground ring-1 ring-hairline transition hover:bg-surface-hover hover:text-foreground"
-                                aria-label="Editar"
-                              >
-                                <Pencil className="size-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(product.id)}
-                                className="rounded-md p-1.5 text-muted-foreground ring-1 ring-hairline transition hover:bg-rose/10 hover:text-rose"
-                                aria-label="Excluir"
-                              >
-                                <Trash2 className="size-4" />
-                              </button>
-                            </div>
+                            <button
+                              onClick={() => handleDelete(product.id)}
+                              className="rounded-md p-1.5 text-muted-foreground ring-1 ring-hairline transition hover:bg-rose/10 hover:text-rose"
+                              aria-label="Excluir"
+                            >
+                              <Trash2 className="size-4" />
+                            </button>
                           </td>
                         </tr>
                       ))}
