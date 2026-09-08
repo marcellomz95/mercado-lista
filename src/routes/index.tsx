@@ -220,6 +220,7 @@ function Index() {
       delete next[id];
       return next;
     });
+    setEditingCell(null);
   }
 
   function handleQtyCommit(id: string, raw: string) {
@@ -230,7 +231,9 @@ function Index() {
       delete next[id];
       return next;
     });
+    setEditingCell(null);
   }
+
 
   function handleDelete(id: string) {
     setProducts((prev) => prev.filter((product) => product.id !== id));
