@@ -83,6 +83,12 @@ function Index() {
   const [priceDrafts, setPriceDrafts] = useState<Record<string, string>>({});
   const [nameDrafts, setNameDrafts] = useState<Record<string, string>>({});
   const [qtyDrafts, setQtyDrafts] = useState<Record<string, string>>({});
+  const [editingCell, setEditingCell] = useState<{
+    id: string;
+    field: "name" | "category" | "quantity" | "unitPrice";
+  } | null>(null);
+  const [lastTouch, setLastTouch] = useState<{ id: string; time: number } | null>(null);
+
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState<Category>("Outros");
