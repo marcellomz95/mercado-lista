@@ -261,6 +261,7 @@ function Index() {
       delete next[id];
       return next;
     });
+    setEditingCell(null);
   }
 
   function togglePurchased(id: string) {
@@ -272,6 +273,46 @@ function Index() {
       )
     );
   }
+
+  function isEditing(id: string, field: typeof editingCell extends infer T ? T extends { field: infer F } ? F : never : never) {
+    return editingCell?.id === id && editingCell?.field === field;
+  }
+
+  function startEditing(
+    id: string,
+    field: "name" | "category" | "quantity" | "unitPrice"
+  ) {
+    setEditingCell({ id, field });
+  }
+
+  function handleCellClick(
+    id: string,
+    field: "name" | "category" | "quantity" | "unitPrice"
+  ) {
+    startEditing(id, field);
+  }
+
+  function handleCellTouch(
+    id: string,
+    field: "name" | "category" | "quantity" | "unitPrice"
+  ) {
+    const now = Date.now();
+    if (
+      lastTouch &&
+      lastTouch.id === `${id}-${field}` &&
+      now - lastTouch.time < 400
+    ) {
+      startEditing(id, field);
+      setLastTouch(null);
+    } else {
+      setLastTouch({ id: `${id}-${field}`, time: now });
+    }
+  }
+
+  function commitEditing() {
+    setEditingCell(null);
+  }
+
 
   function handleInitialBalanceChange(value: string) {
     const numeric = currencyInputToNumber(value);
