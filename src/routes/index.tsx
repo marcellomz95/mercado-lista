@@ -693,100 +693,176 @@ function Index() {
                               >
                                 <Check className="size-3.5" />
                               </button>
-                              <input
-                                type="text"
-                                aria-label={`Nome de ${product.name}`}
-                                value={nameDrafts[product.id] ?? product.name}
-                                onChange={(e) =>
-                                  setNameDrafts((prev) => ({
-                                    ...prev,
-                                    [product.id]: e.target.value,
-                                  }))
-                                }
-                                onFocus={(e) => e.currentTarget.select()}
-                                onBlur={(e) =>
-                                  handleNameCommit(product.id, e.target.value)
-                                }
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter") e.currentTarget.blur();
-                                }}
-                                className={`w-full min-w-28 rounded-md bg-transparent px-1.5 py-1 font-medium ring-1 ring-transparent transition outline-none hover:ring-hairline focus:bg-field focus:ring-2 focus:ring-mint/40 ${
-                                  product.purchased
-                                    ? "text-muted-foreground line-through"
-                                    : "text-foreground"
-                                }`}
-                              />
+                              {isEditing(product.id, "name") ? (
+                                <input
+                                  type="text"
+                                  autoFocus
+                                  aria-label={`Nome de ${product.name}`}
+                                  value={nameDrafts[product.id] ?? product.name}
+                                  onChange={(e) =>
+                                    setNameDrafts((prev) => ({
+                                      ...prev,
+                                      [product.id]: e.target.value,
+                                    }))
+                                  }
+                                  onFocus={(e) => e.currentTarget.select()}
+                                  onBlur={(e) =>
+                                    handleNameCommit(product.id, e.target.value)
+                                  }
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter")
+                                      e.currentTarget.blur();
+                                  }}
+                                  className={`w-full min-w-28 rounded-md bg-field px-1.5 py-1 font-medium ring-2 ring-mint/40 outline-none ${
+                                    product.purchased
+                                      ? "text-muted-foreground line-through"
+                                      : "text-foreground"
+                                  }`}
+                                />
+                              ) : (
+                                <span
+                                  onDoubleClick={() =>
+                                    handleCellClick(product.id, "name")
+                                  }
+                                  onTouchEnd={() =>
+                                    handleCellTouch(product.id, "name")
+                                  }
+                                  title="Duplo clique/toque para editar"
+                                  className={`w-full min-w-28 cursor-pointer rounded-md px-1.5 py-1 font-medium ring-1 ring-transparent transition hover:ring-hairline ${
+                                    product.purchased
+                                      ? "text-muted-foreground line-through"
+                                      : "text-foreground"
+                                  }`}
+                                >
+                                  {product.name}
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className="py-3 pr-3">
-                            <CategorySelect
-                              value={product.category}
-                              onChange={(value) =>
-                                updateProduct(product.id, {
-                                  category: value as Category,
-                                })
-                              }
-                              aria-label={`Categoria de ${product.name}`}
-                              className="w-40"
-                            />
-                          </td>
-                          <td className="py-3 pr-3 text-right">
-                            <input
-                              type="number"
-                              min={1}
-                              aria-label={`Quantidade de ${product.name}`}
-                              value={
-                                qtyDrafts[product.id] ??
-                                product.quantity.toString()
-                              }
-                              onChange={(e) =>
-                                setQtyDrafts((prev) => ({
-                                  ...prev,
-                                  [product.id]: e.target.value,
-                                }))
-                              }
-                              onFocus={(e) => e.currentTarget.select()}
-                              onBlur={(e) =>
-                                handleQtyCommit(product.id, e.target.value)
-                              }
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") e.currentTarget.blur();
-                              }}
-                              className="w-14 rounded-md bg-transparent px-1.5 py-1 text-right text-muted-foreground ring-1 ring-transparent transition outline-none hover:ring-hairline focus:bg-field focus:text-foreground focus:ring-2 focus:ring-mint/40"
-                            />
-                          </td>
-                          <td className="py-3 pr-3 text-right">
-                            <div className="inline-flex items-center gap-1 rounded-lg bg-field px-2 py-1 ring-1 ring-hairline focus-within:ring-2 focus-within:ring-mint/40">
-                              <span className="text-xs text-muted-foreground">
-                                R$
+                            {isEditing(product.id, "category") ? (
+                              <CategorySelect
+                                value={product.category}
+                                onChange={(value) => {
+                                  updateProduct(product.id, {
+                                    category: value as Category,
+                                  });
+                                  commitEditing();
+                                }}
+                                aria-label={`Categoria de ${product.name}`}
+                                className="w-40"
+                              />
+                            ) : (
+                              <span
+                                onDoubleClick={() =>
+                                  handleCellClick(product.id, "category")
+                                }
+                                onTouchEnd={() =>
+                                  handleCellTouch(product.id, "category")
+                                }
+                                title="Duplo clique/toque para editar"
+                                className="inline-block w-40 cursor-pointer rounded-md px-1.5 py-1 text-foreground ring-1 ring-transparent transition hover:ring-hairline"
+                              >
+                                {product.category}
                               </span>
+                            )}
+                          </td>
+                          <td className="py-3 pr-3 text-right">
+                            {isEditing(product.id, "quantity") ? (
                               <input
-                                type="text"
-                                inputMode="decimal"
-                                aria-label={`Preço unitário de ${product.name}`}
+                                type="number"
+                                min={1}
+                                autoFocus
+                                aria-label={`Quantidade de ${product.name}`}
                                 value={
-                                  priceDrafts[product.id] ??
-                                  formatCurrency(product.unitPrice)
+                                  qtyDrafts[product.id] ??
+                                  product.quantity.toString()
                                 }
                                 onChange={(e) =>
-                                  setPriceDrafts((prev) => ({
+                                  setQtyDrafts((prev) => ({
                                     ...prev,
                                     [product.id]: e.target.value,
                                   }))
                                 }
                                 onFocus={(e) => e.currentTarget.select()}
                                 onBlur={(e) =>
-                                  handleUnitPriceCommit(
-                                    product.id,
-                                    e.target.value
-                                  )
+                                  handleQtyCommit(product.id, e.target.value)
                                 }
                                 onKeyDown={(e) => {
-                                  if (e.key === "Enter") e.currentTarget.blur();
+                                  if (e.key === "Enter")
+                                    e.currentTarget.blur();
                                 }}
-                                className="w-16 bg-transparent text-right text-sm text-foreground outline-none"
+                                className="w-14 rounded-md bg-field px-1.5 py-1 text-right text-foreground ring-2 ring-mint/40 outline-none"
                               />
-                            </div>
+                            ) : (
+                              <span
+                                onDoubleClick={() =>
+                                  handleCellClick(product.id, "quantity")
+                                }
+                                onTouchEnd={() =>
+                                  handleCellTouch(product.id, "quantity")
+                                }
+                                title="Duplo clique/toque para editar"
+                                className="inline-block w-14 cursor-pointer rounded-md px-1.5 py-1 text-right text-muted-foreground ring-1 ring-transparent transition hover:ring-hairline"
+                              >
+                                {product.quantity}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 pr-3 text-right">
+                            {isEditing(product.id, "unitPrice") ? (
+                              <div className="inline-flex items-center gap-1 rounded-lg bg-field px-2 py-1 ring-2 ring-mint/40">
+                                <span className="text-xs text-muted-foreground">
+                                  R$
+                                </span>
+                                <input
+                                  type="text"
+                                  inputMode="decimal"
+                                  autoFocus
+                                  aria-label={`Preço unitário de ${product.name}`}
+                                  value={
+                                    priceDrafts[product.id] ??
+                                    formatCurrency(product.unitPrice)
+                                  }
+                                  onChange={(e) =>
+                                    setPriceDrafts((prev) => ({
+                                      ...prev,
+                                      [product.id]: e.target.value,
+                                    }))
+                                  }
+                                  onFocus={(e) => e.currentTarget.select()}
+                                  onBlur={(e) =>
+                                    handleUnitPriceCommit(
+                                      product.id,
+                                      e.target.value
+                                    )
+                                  }
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter")
+                                      e.currentTarget.blur();
+                                  }}
+                                  className="w-16 bg-transparent text-right text-sm text-foreground outline-none"
+                                />
+                              </div>
+                            ) : (
+                              <span
+                                onDoubleClick={() =>
+                                  handleCellClick(product.id, "unitPrice")
+                                }
+                                onTouchEnd={() =>
+                                  handleCellTouch(product.id, "unitPrice")
+                                }
+                                title="Duplo clique/toque para editar"
+                                className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 ring-1 ring-hairline transition hover:bg-field"
+                              >
+                                <span className="text-xs text-muted-foreground">
+                                  R$
+                                </span>
+                                <span className="text-sm text-foreground">
+                                  {formatCurrency(product.unitPrice)}
+                                </span>
+                              </span>
+                            )}
                           </td>
                           <td className="py-3 pr-3 text-right font-semibold text-foreground">
                             {formatCurrency(product.quantity * product.unitPrice)}
@@ -803,6 +879,7 @@ function Index() {
                         </tr>
                       ))}
                     </tbody>
+
                   </table>
                 )}
               </div>
