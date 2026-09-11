@@ -11,7 +11,11 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { CategorySelect, type Category } from "@/components/CategorySelect";
+import {
+  CategorySelect,
+  CATEGORY_ICONS,
+  type Category,
+} from "@/components/CategorySelect";
 import { decodeSeed, encodeSeed } from "@/lib/seed";
 import { ThemeSelect } from "@/components/ThemeSelect";
 
@@ -662,7 +666,6 @@ function Index() {
                     <thead>
                       <tr className="text-left text-xs text-muted-foreground">
                         <th className="pb-2 font-medium">Produto</th>
-                        <th className="pb-2 font-medium">Categoria</th>
                         <th className="pb-2 text-right font-medium">Qtd</th>
                         <th className="pb-2 text-right font-medium">Unit.</th>
                         <th className="pb-2 text-right font-medium">Total</th>
@@ -675,7 +678,7 @@ function Index() {
                       {filteredProducts.map((product) => (
                         <tr key={product.id}>
                           <td className="py-3 pr-3">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-start gap-2">
                               <button
                                 type="button"
                                 onClick={() => togglePurchased(product.id)}
@@ -685,7 +688,7 @@ function Index() {
                                     : "Marcar como comprado"
                                 }
                                 aria-pressed={product.purchased}
-                                className={`grid size-5 shrink-0 place-items-center rounded-md ring-1 transition ${
+                                className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md ring-1 transition ${
                                   product.purchased
                                     ? "bg-mint text-onprimary ring-mint/50"
                                     : "bg-field text-transparent ring-hairline hover:ring-mint/40"
@@ -693,79 +696,84 @@ function Index() {
                               >
                                 <Check className="size-3.5" />
                               </button>
-                              {isEditing(product.id, "name") ? (
-                                <input
-                                  type="text"
-                                  autoFocus
-                                  aria-label={`Nome de ${product.name}`}
-                                  value={nameDrafts[product.id] ?? product.name}
-                                  onChange={(e) =>
-                                    setNameDrafts((prev) => ({
-                                      ...prev,
-                                      [product.id]: e.target.value,
-                                    }))
-                                  }
-                                  onFocus={(e) => e.currentTarget.select()}
-                                  onBlur={(e) =>
-                                    handleNameCommit(product.id, e.target.value)
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter")
-                                      e.currentTarget.blur();
-                                  }}
-                                  className={`w-full min-w-28 rounded-md bg-field px-1.5 py-1 font-medium ring-2 ring-mint/40 outline-none ${
-                                    product.purchased
-                                      ? "text-muted-foreground line-through"
+                              <div className="min-w-0 flex-1">
+                                {isEditing(product.id, "name") ? (
+                                  <input
+                                    type="text"
+                                    autoFocus
+                                    aria-label={`Nome de ${product.name}`}
+                                    value={nameDrafts[product.id] ?? product.name}
+                                    onChange={(e) =>
+                                      setNameDrafts((prev) => ({
+                                        ...prev,
+                                        [product.id]: e.target.value,
+                                      }))
+                                    }
+                                    onFocus={(e) => e.currentTarget.select()}
+                                    onBlur={(e) =>
+                                      handleNameCommit(product.id, e.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter")
+                                        e.currentTarget.blur();
+                                    }}
+                                    className={`w-full min-w-28 rounded-md bg-field px-1.5 py-1 font-medium ring-2 ring-mint/40 outline-none ${
+                                      product.purchased
+                                        ? "text-muted-foreground line-through"
+                                        : "text-foreground"
+                                    }`}
+                                  />
+                                ) : (
+                                  <span
+                                    onDoubleClick={() =>
+                                      handleCellClick(product.id, "name")
+                                    }
+                                    onTouchEnd={() =>
+                                      handleCellTouch(product.id, "name")
+                                    }
+                                    title="Duplo clique/toque para editar"
+                                    className={`block w-full min-w-28 cursor-pointer rounded-md px-1.5 py-1 font-medium ring-1 ring-transparent transition hover:ring-hairline ${
+                                      product.purchased
+                                        ? "text-muted-foreground line-through"
                                       : "text-foreground"
-                                  }`}
-                                />
-                              ) : (
-                                <span
-                                  onDoubleClick={() =>
-                                    handleCellClick(product.id, "name")
-                                  }
-                                  onTouchEnd={() =>
-                                    handleCellTouch(product.id, "name")
-                                  }
-                                  title="Duplo clique/toque para editar"
-                                  className={`w-full min-w-28 cursor-pointer rounded-md px-1.5 py-1 font-medium ring-1 ring-transparent transition hover:ring-hairline ${
-                                    product.purchased
-                                      ? "text-muted-foreground line-through"
-                                      : "text-foreground"
-                                  }`}
-                                >
-                                  {product.name}
-                                </span>
-                              )}
+                                    }`}
+                                  >
+                                    {product.name}
+                                  </span>
+                                )}
+                                <div className="mt-0.5">
+                                  {isEditing(product.id, "category") ? (
+                                    <CategorySelect
+                                      value={product.category}
+                                      onChange={(value) => {
+                                        updateProduct(product.id, {
+                                          category: value as Category,
+                                        });
+                                        commitEditing();
+                                      }}
+                                      aria-label={`Categoria de ${product.name}`}
+                                      className="w-44"
+                                    />
+                                  ) : (
+                                    <span
+                                      onDoubleClick={() =>
+                                        handleCellClick(product.id, "category")
+                                      }
+                                      onTouchEnd={() =>
+                                        handleCellTouch(product.id, "category")
+                                      }
+                                      title="Duplo clique/toque para editar"
+                                      className="inline-flex cursor-pointer items-center gap-1 rounded-md px-1 py-0.5 text-xs text-muted-foreground ring-1 ring-transparent transition hover:ring-hairline"
+                                    >
+                                      <span className="text-muted-foreground">
+                                        {CATEGORY_ICONS[product.category]}
+                                      </span>
+                                      <span>{product.category}</span>
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                          </td>
-                          <td className="py-3 pr-3">
-                            {isEditing(product.id, "category") ? (
-                              <CategorySelect
-                                value={product.category}
-                                onChange={(value) => {
-                                  updateProduct(product.id, {
-                                    category: value as Category,
-                                  });
-                                  commitEditing();
-                                }}
-                                aria-label={`Categoria de ${product.name}`}
-                                className="w-40"
-                              />
-                            ) : (
-                              <span
-                                onDoubleClick={() =>
-                                  handleCellClick(product.id, "category")
-                                }
-                                onTouchEnd={() =>
-                                  handleCellTouch(product.id, "category")
-                                }
-                                title="Duplo clique/toque para editar"
-                                className="inline-block w-40 cursor-pointer rounded-md px-1.5 py-1 text-foreground ring-1 ring-transparent transition hover:ring-hairline"
-                              >
-                                {product.category}
-                              </span>
-                            )}
                           </td>
                           <td className="py-3 pr-3 text-right">
                             {isEditing(product.id, "quantity") ? (
