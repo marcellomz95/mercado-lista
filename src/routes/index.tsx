@@ -11,7 +11,11 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { CategorySelect, type Category } from "@/components/CategorySelect";
+import {
+  CategorySelect,
+  CATEGORY_ICONS,
+  type Category,
+} from "@/components/CategorySelect";
 import { decodeSeed, encodeSeed } from "@/lib/seed";
 import { ThemeSelect } from "@/components/ThemeSelect";
 
