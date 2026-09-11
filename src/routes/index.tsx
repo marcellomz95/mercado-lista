@@ -666,7 +666,6 @@ function Index() {
                     <thead>
                       <tr className="text-left text-xs text-muted-foreground">
                         <th className="pb-2 font-medium">Produto</th>
-                        <th className="pb-2 font-medium">Categoria</th>
                         <th className="pb-2 text-right font-medium">Qtd</th>
                         <th className="pb-2 text-right font-medium">Unit.</th>
                         <th className="pb-2 text-right font-medium">Total</th>
